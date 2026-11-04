@@ -1,0 +1,13 @@
+﻿<div class="db-eyebrow">CARDFLOW / OPERATIONS OVERVIEW</div>
+<header class="db-heading"><div><h1>Dashboard</h1><p>A clear view of your card operations, from enrollment to handover.</p></div><button class="db-refresh" (click)="load()" [disabled]="loading"><i class="fas fa-sync-alt" [class.fa-spin]="loading" aria-hidden="true"></i> {{ loading ? 'Updating...' : 'Refresh overview' }}</button></header>
+<section class="db-banner"><div><span class="db-banner-label">YOUR WORKSPACE AT A GLANCE</span><h2>Every stage. In view.</h2><p>Live totals for the areas you have access to. Open a workspace to take the next action.</p></div><div class="db-update" role="status"><span class="db-dot"></span><strong>{{ error ? 'Update interrupted' : loading ? 'Updating overview' : 'Connected overview' }}</strong><small *ngIf="summary">Last updated {{ summary.generatedAt | date:'mediumTime' }}</small><small>Refreshes every 30 seconds</small></div></section>
+<div *ngIf="error" class="db-error" role="alert">{{ error }} <button (click)="load()" [disabled]="loading">Retry</button></div>
+<div *ngIf="loading && !summary" class="db-empty" role="status">Loading your operational overview...</div>
+<div *ngIf="summary && !sections.length" class="db-empty"><i class="fas fa-lock" aria-hidden="true"></i><h2>No workspaces assigned</h2><p>Contact your administrator to enable access to enrollment, production, quality, or delivery.</p></div>
+<div class="db-sections" [attr.aria-busy]="loading">
+  <section *ngFor="let section of sections" class="db-section">
+    <div class="db-section-heading"><div class="db-section-title"><span class="db-icon"><i class="fas" [ngClass]="section.icon" aria-hidden="true"></i></span><div><h2>{{ section.title }}</h2><p>{{ section.subtitle }}</p></div></div><a [routerLink]="section.route" [attr.aria-label]="'Open ' + section.title">Open workspace <i class="fas fa-arrow-right" aria-hidden="true"></i></a></div>
+    <div class="db-metrics"><div *ngFor="let metric of section.metrics" class="db-metric" [ngClass]="metric.tone"><span class="db-metric-label"><span></span>{{ metric.label }}</span><strong>{{ metric.value | number }}</strong><small>{{ section.title === 'Production' ? 'batches' : section.title === 'Quality' ? 'inspections' : section.title === 'Enrollment' ? 'requests' : 'cards' }}</small></div></div>
+  </section>
+</div>
+<p *ngIf="sections.length" class="db-note"><i class="fas fa-info-circle" aria-hidden="true"></i> Counts describe each workspace separately. An approved request can also have a completed inspection and delivery; these figures should not be added together.</p>

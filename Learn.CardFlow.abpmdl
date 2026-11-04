@@ -1,0 +1,109 @@
+{
+  "template": "app",
+  "imports": {
+    "Volo.Abp.LeptonXLiteTheme": {
+      "version": "5.6.0",
+      "isInstalled": true,
+      "creationTime": "10/28/2026 09:15:18 +00:00"
+    },
+    "Volo.Abp.Account": {
+      "version": "10.6.0",
+      "isInstalled": true,
+      "creationTime": "10/28/2026 09:15:18 +00:00"
+    },
+    "Volo.Abp.OpenIddict": {
+      "version": "10.6.0",
+      "isInstalled": true,
+      "creationTime": "10/28/2026 09:15:18 +00:00"
+    },
+    "Volo.Abp.Identity": {
+      "version": "10.6.0",
+      "isInstalled": true,
+      "creationTime": "10/28/2026 09:15:18 +00:00"
+    },
+    "Volo.Abp.SettingManagement": {
+      "version": "10.6.0",
+      "isInstalled": true,
+      "creationTime": "10/28/2026 09:15:18 +00:00"
+    },
+    "Volo.Abp.PermissionManagement": {
+      "version": "10.6.0",
+      "isInstalled": true,
+      "creationTime": "10/28/2026 09:15:18 +00:00"
+    },
+    "Volo.Abp.FeatureManagement": {
+      "version": "10.6.0",
+      "isInstalled": true,
+      "creationTime": "10/28/2026 09:15:18 +00:00"
+    },
+    "Volo.Abp.BlobStoring.Database": {
+      "version": "10.6.0",
+      "isInstalled": true,
+      "creationTime": "10/28/2026 09:15:18 +00:00"
+    }
+  },
+  "folders": {
+    "items": {
+      "src": {},
+      "test": {}
+    }
+  },
+  "packages": {
+    "Learn.CardFlow.Application": {
+      "path": "src/Learn.CardFlow.Application/Learn.CardFlow.Application.abppkg",
+      "folder": "src"
+    },
+    "Learn.CardFlow.Application.Tests": {
+      "path": "test/Learn.CardFlow.Application.Tests/Learn.CardFlow.Application.Tests.abppkg",
+      "folder": "test"
+    },
+    "Learn.CardFlow.Domain.Shared": {
+      "path": "src/Learn.CardFlow.Domain.Shared/Learn.CardFlow.Domain.Shared.abppkg",
+      "folder": "src"
+    },
+    "Learn.CardFlow.Application.Contracts": {
+      "path": "src/Learn.CardFlow.Application.Contracts/Learn.CardFlow.Application.Contracts.abppkg",
+      "folder": "src"
+    },
+    "Learn.CardFlow.HttpApi": {
+      "path": "src/Learn.CardFlow.HttpApi/Learn.CardFlow.HttpApi.abppkg",
+      "folder": "src"
+    },
+    "Learn.CardFlow.HttpApi.Client": {
+      "path": "src/Learn.CardFlow.HttpApi.Client/Learn.CardFlow.HttpApi.Client.abppkg",
+      "folder": "src"
+    },
+    "Learn.CardFlow.EntityFrameworkCore.Tests": {
+      "path": "test/Learn.CardFlow.EntityFrameworkCore.Tests/Learn.CardFlow.EntityFrameworkCore.Tests.abppkg",
+      "folder": "test"
+    },
+    "Learn.CardFlow.EntityFrameworkCore": {
+      "path": "src/Learn.CardFlow.EntityFrameworkCore/Learn.CardFlow.EntityFrameworkCore.abppkg",
+      "folder": "src"
+    },
+    "Learn.CardFlow.TestBase": {
+      "path": "test/Learn.CardFlow.TestBase/Learn.CardFlow.TestBase.abppkg",
+      "folder": "test"
+    },
+    "Learn.CardFlow.Domain.Tests": {
+      "path": "test/Learn.CardFlow.Domain.Tests/Learn.CardFlow.Domain.Tests.abppkg",
+      "folder": "test"
+    },
+    "Learn.CardFlow.HttpApi.Client.ConsoleTestApp": {
+      "path": "test/Learn.CardFlow.HttpApi.Client.ConsoleTestApp/Learn.CardFlow.HttpApi.Client.ConsoleTestApp.abppkg",
+      "folder": "test"
+    },
+    "Learn.CardFlow.DbMigrator": {
+      "path": "src/Learn.CardFlow.DbMigrator/Learn.CardFlow.DbMigrator.abppkg",
+      "folder": "src"
+    },
+    "Learn.CardFlow.HttpApi.Host": {
+      "path": "src/Learn.CardFlow.HttpApi.Host/Learn.CardFlow.HttpApi.Host.abppkg",
+      "folder": "src"
+    },
+    "Learn.CardFlow.Domain": {
+      "path": "src/Learn.CardFlow.Domain/Learn.CardFlow.Domain.abppkg",
+      "folder": "src"
+    }
+  }
+}

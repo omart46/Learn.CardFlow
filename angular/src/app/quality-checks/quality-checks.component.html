@@ -1,0 +1,37 @@
+<div class="cf-page-eyebrow">CARDFLOW <span>/</span> QUALITY ASSURANCE</div>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+  <div><h1>Quality checks</h1><p class="text-muted mb-0">Inspect produced cards and record a clear result for every employee.</p></div>
+  <button class="btn btn-outline-secondary" (click)="load()" [disabled]="busy || loading">{{ loading ? 'Refreshing…' : 'Refresh' }}</button>
+</div>
+<div *ngIf="notice" class="alert alert-success" role="status">{{ notice }}</div>
+<div *ngIf="error" class="alert alert-danger" role="alert">{{ error }}</div>
+<div class="qc-flow mb-4"><span><i class="fas fa-layer-group" aria-hidden="true"></i> Completed production</span><span aria-hidden="true">?</span><span>Start inspection</span><span aria-hidden="true">?</span><span>Pass or fail</span></div>
+<section *ngIf="failing as check" class="card mb-4 qc-failure" #failurePanel aria-labelledby="failure-heading">
+  <form class="card-body" [formGroup]="form" (ngSubmit)="fail()">
+    <h2 id="failure-heading" class="h5">Fail inspection — {{ check.employeeName }}</h2>
+    <p class="text-muted">{{ check.employeeNumber }} · {{ check.batchName }}. The result cannot be changed once saved.</p>
+    <label class="form-label" for="quality-reason">Failure reason</label>
+    <textarea id="quality-reason" class="form-control" rows="3" formControlName="reason" maxlength="500" placeholder="Describe the issue found on this card." [readOnly]="busy" aria-describedby="reason-help"></textarea>
+    <div id="reason-help" class="text-muted small my-2">Required · Up to 500 characters</div>
+    <p *ngIf="form.controls.reason.touched && form.controls.reason.invalid" class="text-danger small">Enter a failure reason between 1 and 500 characters.</p>
+    <div class="d-flex gap-2"><button class="btn btn-danger" [disabled]="busy || loading || form.invalid">Record failure</button><button type="button" class="btn btn-outline-secondary" [disabled]="busy" (click)="failing = null">Cancel</button></div>
+  </form>
+</section>
+<section class="card mb-4" aria-labelledby="ready-heading">
+  <div class="cf-register-heading"><div><span class="cf-register-icon"><i class="fas fa-clipboard-check" aria-hidden="true"></i></span><strong id="ready-heading">Ready for quality check</strong><span class="cf-count">{{ readyTotal }} cards</span></div></div>
+  <p class="qc-intro">Cards from completed batches appear automatically. Start an inspection to move a card into the register below.</p>
+  <p *ngIf="loading" class="px-4 small text-muted" role="status">Updating cards and inspections…</p>
+  <div class="table-responsive"><table class="table align-middle"><thead><tr><th>EMPLOYEE</th><th>EMPLOYEE NUMBER</th><th>PRODUCTION BATCH</th><th>ACTION</th></tr></thead><tbody>
+    <tr *ngFor="let card of ready"><td>{{ card.employeeName }}</td><td>{{ card.employeeNumber }}</td><td>{{ card.batchName }}</td><td><button *ngIf="can('Create'); else viewOnly" class="btn btn-sm btn-outline-primary" [disabled]="loading || busy" (click)="create(card)">Start inspection</button><ng-template #viewOnly><span class="text-muted">View only</span></ng-template></td></tr>
+    <tr *ngIf="!ready.length && !loading && !error"><td colspan="4" class="text-center py-5">No cards waiting for inspection. Cards will appear after production is completed.</td></tr>
+  </tbody></table></div>
+  <nav class="d-flex justify-content-between align-items-center p-3" aria-label="Ready card pages"><button class="btn btn-sm btn-outline-secondary" [disabled]="!readyPage || busy || loading" (click)="readyPage = readyPage - 1; load()">Previous</button><span>Page {{ readyPage + 1 }}</span><button class="btn btn-sm btn-outline-secondary" [disabled]="(readyPage + 1) * 10 >= readyTotal || busy || loading" (click)="readyPage = readyPage + 1; load()">Next</button></nav>
+</section>
+<section class="card" aria-labelledby="register-heading">
+  <div class="cf-register-heading"><div><span class="cf-register-icon"><i class="fas fa-check-double" aria-hidden="true"></i></span><strong id="register-heading">Inspection register</strong><span class="cf-count">{{ total }} inspections</span></div><span class="cf-register-note">Results are final once recorded</span></div>
+  <div class="table-responsive"><table class="table align-middle"><thead><tr><th>EMPLOYEE</th><th>EMPLOYEE NUMBER</th><th>BATCH</th><th>RESULT</th><th>CREATED</th><th>ACTIONS</th></tr></thead><tbody>
+    <tr *ngFor="let check of checks"><td>{{ check.employeeName }}</td><td>{{ check.employeeNumber }}</td><td>{{ check.batchName }}</td><td><span class="badge" [ngClass]="['bg-secondary', 'bg-success', 'bg-danger'][check.status]">{{ statuses[check.status] }}</span><details *ngIf="check.failureReason" class="cf-reason mt-2"><summary>Failure reason</summary><p>{{ check.failureReason }}</p></details></td><td>{{ check.creationTime | date:'mediumDate' }}</td><td><div *ngIf="check.status === 0 && can('Inspect'); else finalResult" class="d-flex gap-2"><button class="btn btn-sm btn-outline-success" [disabled]="busy || loading" (click)="pass(check)">Pass</button><button class="btn btn-sm btn-outline-danger" [disabled]="busy || loading" (click)="openFailure(check)">Fail</button></div><ng-template #finalResult><span class="text-muted">{{ check.status === 0 ? 'Awaiting inspector' : 'Completed' }}</span></ng-template></td></tr>
+    <tr *ngIf="!checks.length && !loading && !error"><td colspan="6" class="text-center py-5">No inspections yet. Start with a card ready for quality check.</td></tr>
+  </tbody></table></div>
+  <nav class="d-flex justify-content-between align-items-center p-3" aria-label="Inspection pages"><button class="btn btn-sm btn-outline-secondary" [disabled]="!page || busy || loading" (click)="page = page - 1; load()">Previous</button><span>Page {{ page + 1 }}</span><button class="btn btn-sm btn-outline-secondary" [disabled]="(page + 1) * 10 >= total || busy || loading" (click)="page = page + 1; load()">Next</button></nav>
+</section>

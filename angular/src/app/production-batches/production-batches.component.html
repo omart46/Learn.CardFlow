@@ -1,0 +1,48 @@
+<div class="cf-page-eyebrow">CARDFLOW <span>/</span> PRODUCTION</div>
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+  <div><h1>Production batches</h1><p class="text-muted mb-0">Group approved requests and track production from start to finish.</p></div>
+  <button *ngIf="can('Create')" class="btn btn-primary" (click)="showCreate = !showCreate" [disabled]="busy">{{ showCreate ? 'Cancel' : '+ New batch' }}</button>
+</div>
+<div *ngIf="notice" class="alert alert-success" role="status">{{ notice }}</div>
+<form *ngIf="showCreate" class="card mb-4" (ngSubmit)="create()">
+  <div class="card-body"><h2 class="h5">Create a batch</h2>
+    <label class="form-label" for="batch-name">Batch name</label>
+    <input id="batch-name" class="form-control mb-3" name="name" [(ngModel)]="name" required maxlength="128" placeholder="e.g. November employee cards" [disabled]="busy">
+    <button class="btn btn-primary" [disabled]="busy || !name.trim()">{{ busy ? 'Saving…' : 'Create batch' }}</button>
+  </div>
+</form>
+<div class="card mb-4">
+  <div class="cf-register-heading"><div><span class="cf-register-icon"><i class="fas fa-layer-group" aria-hidden="true"></i></span><strong>Batch register</strong><span class="cf-count">{{ total }} total</span></div><button class="btn btn-sm btn-outline-secondary" (click)="load()" [disabled]="loading || busy">Refresh</button></div>
+  <div *ngIf="error" class="alert alert-danger m-3" role="alert">{{ error }}</div>
+  <p *ngIf="loading" class="p-4 mb-0" role="status">Loading batches…</p>
+  <div class="table-responsive" *ngIf="!loading && !error"><table class="table align-middle">
+    <thead><tr><th>BATCH NAME</th><th>REQUESTS</th><th>STATUS</th><th>CREATED</th><th>ACTIONS</th></tr></thead>
+    <tbody><tr *ngFor="let batch of items"><td>{{ batch.name }}</td><td>{{ batch.requestCount }}</td><td><span class="badge" [ngClass]="['bg-secondary', 'bg-info', 'bg-success'][batch.status]">{{ statuses[batch.status] }}</span></td><td>{{ batch.creationTime | date:'mediumDate' }}</td><td><div class="d-flex flex-wrap gap-2">
+      <button class="btn btn-sm btn-outline-primary" (click)="open(batch)" [disabled]="busy || detailLoading">{{ selected?.id === batch.id ? 'Viewing requests' : 'View requests' }}</button>
+      <button *ngIf="can('Produce') && batch.status < 2" class="btn btn-sm btn-outline-success" (click)="transition(batch)" [disabled]="busy || (batch.status === 0 && batch.requestCount === 0)">{{ batch.status === 0 ? 'Start production' : 'Complete production' }}</button>
+    </div></td></tr><tr *ngIf="!items.length"><td colspan="5" class="text-center py-5">No batches yet. Create a batch to get started.</td></tr></tbody>
+  </table></div>
+  <nav class="d-flex justify-content-between align-items-center p-3" aria-label="Batch pages"><button class="btn btn-sm btn-outline-secondary" [disabled]="page === 0 || loading || busy" (click)="page = page - 1; load()">Previous</button><span>Page {{ page + 1 }}</span><button class="btn btn-sm btn-outline-secondary" [disabled]="(page + 1) * 10 >= total || loading || busy" (click)="page = page + 1; load()">Next</button></nav>
+</div>
+<section class="card mb-4">
+  <div class="cf-register-heading"><div><strong>Ready for Production</strong><span class="cf-count">{{ readyTotal }} requests</span></div><button class="btn btn-sm btn-outline-secondary" (click)="loadReady()" [disabled]="readyLoading || busy">Refresh</button></div>
+  <div class="card-body"><p class="text-muted mb-0">Approved, unassigned card requests appear here automatically. Select a draft batch using View requests, then add requests below. Updates every 15 seconds.</p></div>
+  <p *ngIf="readyError" class="alert alert-danger m-3" role="alert">{{ readyError }}</p>
+  <p *ngIf="readyLoading && !ready.length" class="p-3" role="status">Loading approved requests…</p>
+  <div class="table-responsive"><table class="table align-middle"><thead><tr><th>EMPLOYEE</th><th>EMPLOYEE NUMBER</th><th>DESTINATION</th></tr></thead><tbody>
+    <tr *ngFor="let request of ready"><td>{{ request.employeeName }}</td><td>{{ request.employeeNumber }}</td><td>
+      <button *ngIf="can('ManageRequests') && selected?.status === 0; else chooseBatch" class="btn btn-sm btn-outline-primary" [disabled]="busy || detailLoading || readyLoading" (click)="changeRequest(request.id)">Add to {{ selected?.name }}</button>
+      <ng-template #chooseBatch><span class="text-muted">Select a draft batch first</span></ng-template>
+    </td></tr><tr *ngIf="!readyLoading && !readyError && !ready.length"><td colspan="3" class="text-center py-4">No approved requests waiting for production.</td></tr>
+  </tbody></table></div>
+  <nav class="d-flex justify-content-between align-items-center p-3" aria-label="Ready request pages"><button class="btn btn-sm btn-outline-secondary" [disabled]="readyPage === 0 || readyLoading || busy" (click)="readyPage = readyPage - 1; loadReady()">Previous</button><span>Page {{ readyPage + 1 }}</span><button class="btn btn-sm btn-outline-secondary" [disabled]="(readyPage + 1) * 10 >= readyTotal || readyLoading || busy" (click)="readyPage = readyPage + 1; loadReady()">Next</button></nav>
+</section>
+<section *ngIf="selected as batch" class="card" #batchDetails tabindex="-1" style="scroll-margin-top:24px" aria-label="Selected batch requests">
+  <div class="cf-register-heading"><div><strong>{{ batch.name }}</strong><span class="badge bg-secondary">{{ statuses[batch.status] }}</span></div><button class="btn btn-sm btn-outline-secondary" (click)="selected = null" [disabled]="busy || detailLoading">Close</button></div>
+  <p *ngIf="detailLoading" class="p-4" role="status">Loading requests…</p>
+  <div *ngIf="detailError" class="alert alert-danger m-3" role="alert">{{ detailError }} <button class="btn btn-sm btn-outline-secondary" (click)="loadRequests()">Retry</button></div>
+  <div class="table-responsive" *ngIf="!detailLoading && !detailError"><table class="table align-middle"><thead><tr><th>EMPLOYEE</th><th>EMPLOYEE NUMBER</th><th>ACTIONS</th></tr></thead><tbody><tr *ngFor="let request of requests"><td>{{ request.employeeName }}</td><td>{{ request.employeeNumber }}</td><td><button *ngIf="batch.status === 0 && can('ManageRequests')" class="btn btn-sm btn-outline-danger" [disabled]="busy" (click)="changeRequest(request.id, true)">Remove</button></td></tr><tr *ngIf="!requests.length"><td colspan="3" class="text-center py-4">No requests in this batch.</td></tr></tbody></table></div>
+  <nav class="d-flex justify-content-between align-items-center p-3" aria-label="Batch request pages"><button class="btn btn-sm btn-outline-secondary" [disabled]="requestPage === 0 || detailLoading || busy" (click)="requestPage = requestPage - 1; loadRequests()">Previous</button><span>{{ requestTotal }} requests · Page {{ requestPage + 1 }}</span><button class="btn btn-sm btn-outline-secondary" [disabled]="(requestPage + 1) * 10 >= requestTotal || detailLoading || busy" (click)="requestPage = requestPage + 1; loadRequests()">Next</button></nav>
+</section>
+
+

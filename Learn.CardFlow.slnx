@@ -1,0 +1,23 @@
+<Solution>
+    <Configurations>
+        <Platform Name="Any CPU" />
+    </Configurations>
+    <Folder Name="/src/">
+        <Project Path="src/Learn.CardFlow.Domain/Learn.CardFlow.Domain.csproj" />
+        <Project Path="src/Learn.CardFlow.Application/Learn.CardFlow.Application.csproj" />
+        <Project Path="src/Learn.CardFlow.EntityFrameworkCore/Learn.CardFlow.EntityFrameworkCore.csproj" />
+        <Project Path="src/Learn.CardFlow.Domain.Shared/Learn.CardFlow.Domain.Shared.csproj" />
+        <Project Path="src/Learn.CardFlow.Application.Contracts/Learn.CardFlow.Application.Contracts.csproj" />
+        <Project Path="src/Learn.CardFlow.HttpApi/Learn.CardFlow.HttpApi.csproj" />
+        <Project Path="src/Learn.CardFlow.HttpApi.Client/Learn.CardFlow.HttpApi.Client.csproj" />
+        <Project Path="src/Learn.CardFlow.HttpApi.Host/Learn.CardFlow.HttpApi.Host.csproj" />
+        <Project Path="src/Learn.CardFlow.DbMigrator/Learn.CardFlow.DbMigrator.csproj" />
+    </Folder>
+    <Folder Name="/test/">
+        <Project Path="test/Learn.CardFlow.Application.Tests/Learn.CardFlow.Application.Tests.csproj" />
+        <Project Path="test/Learn.CardFlow.EntityFrameworkCore.Tests/Learn.CardFlow.EntityFrameworkCore.Tests.csproj" />
+        <Project Path="test/Learn.CardFlow.TestBase/Learn.CardFlow.TestBase.csproj" />
+        <Project Path="test/Learn.CardFlow.Domain.Tests/Learn.CardFlow.Domain.Tests.csproj" />
+        <Project Path="test/Learn.CardFlow.HttpApi.Client.ConsoleTestApp/Learn.CardFlow.HttpApi.Client.ConsoleTestApp.csproj" />
+    </Folder>
+</Solution>

@@ -1,0 +1,68 @@
+<div class="cf-home">
+  <div class="cf-eyebrow"><span></span> EMPLOYEE CARD OPERATIONS</div>
+  <section class="cf-hero">
+    <div class="cf-hero-copy">
+      <p class="cf-kicker">YOUR WORKSPACE, CONNECTED.</p>
+      <h1>Every card.<br>One clear flow.</h1>
+      <p class="cf-description">Manage employee enrollment, review requests, and bring approved cards into production. One workspace for every handoff.</p>
+      @if (!hasLoggedIn) {
+        <button class="btn cf-primary" (click)="login()">Sign in to your workspace <i class="fas fa-arrow-right ms-3" aria-hidden="true"></i></button>
+      } @else {
+        <div class="cf-actions">
+          <a class="btn cf-primary" routerLink="/dashboard">Open dashboard <i class="fas fa-chart-pie ms-2" aria-hidden="true"></i></a>
+          @if (canViewRequests) {
+            <a class="btn cf-primary" routerLink="/card-requests">Open enrollment <i class="fas fa-arrow-right ms-2" aria-hidden="true"></i></a>
+          }
+          @if (canViewBatches) {
+            <a class="btn cf-primary" routerLink="/production-batches">Open production <i class="fas fa-arrow-right ms-2" aria-hidden="true"></i></a>
+          }
+          @if (canViewQuality) {
+            <a class="btn cf-primary" routerLink="/quality-checks">Open quality checks <i class="fas fa-arrow-right ms-2" aria-hidden="true"></i></a>
+          }
+          @if (canViewDeliveries) {
+            <a class="btn cf-primary" routerLink="/deliveries">Open deliveries <i class="fas fa-arrow-right ms-2" aria-hidden="true"></i></a>
+          }
+          @if (!canViewRequests && !canViewBatches && !canViewQuality && !canViewDeliveries) {
+            <p class="cf-access-note">Contact your administrator for workspace access.</p>
+          }
+        </div>
+      }
+      <div class="cf-hero-note"><i class="fas fa-shield-alt" aria-hidden="true"></i> Role-based access. Clear decisions.</div>
+    </div>
+    <div class="cf-card-scene" aria-hidden="true">
+      <div class="cf-orbit"></div>
+      <div class="cf-id-card">
+        <div class="cf-id-top"><span class="cf-card-brand">▧ &nbsp; CardFlow</span><span>EMPLOYEE ACCESS</span></div>
+        <div class="cf-id-profile"><div class="cf-avatar"><i class="fas fa-user"></i></div><div><div class="cf-placeholder long"></div><div class="cf-placeholder short"></div><span>EMPLOYEE CARD</span></div></div>
+        <div class="cf-id-bottom"><span>CONNECTED BY DESIGN</span><div class="cf-barcode"></div></div>
+      </div>
+      <div class="cf-floating-note"><span class="cf-check"><i class="fas fa-check"></i></span><div><strong>Connected operations</strong><small>From enrollment to production</small></div></div>
+    </div>
+  </section>
+  <section class="cf-workflow" aria-labelledby="workflow-title">
+    <div class="cf-section-heading"><div><p class="cf-kicker">YOUR OPERATIONAL FLOW</p><h2 id="workflow-title">From request to handover.</h2></div><span>Six stages. Clear responsibilities.</span></div>
+    <div class="cf-workflow-grid">
+      <article><div class="cf-step-top"><span class="cf-step-icon"><i class="far fa-file-alt" aria-hidden="true"></i></span><span>01</span></div><h3>Enrollment</h3><p>Create employee card requests. Correct rejected details and resubmit for review.</p></article>
+      <article><div class="cf-step-top"><span class="cf-step-icon"><i class="fas fa-search" aria-hidden="true"></i></span><span>02</span></div><h3>Review & decision</h3><p>Reviewers start the review. Supervisors approve requests or return them with a rejection reason.</p></article>
+      <article><div class="cf-step-top"><span class="cf-step-icon"><i class="fas fa-layer-group" aria-hidden="true"></i></span><span>03</span></div><h3>Build a batch</h3><p>Approved requests appear in Ready for Production. Add them to a draft batch without copying IDs.</p></article>
+      <article><div class="cf-step-top"><span class="cf-step-icon"><i class="fas fa-cogs" aria-hidden="true"></i></span><span>04</span></div><h3>Production</h3><p>Start production to lock the batch contents, then mark the batch completed when finished.</p></article>
+      <article><div class="cf-step-top"><span class="cf-step-icon"><i class="fas fa-clipboard-check" aria-hidden="true"></i></span><span>05</span></div><h3>Quality check</h3><p>Inspect produced cards. Record a pass or a failure with a clear reason.</p></article>
+      <article><div class="cf-step-top"><span class="cf-step-icon"><i class="fas fa-hand-holding" aria-hidden="true"></i></span><span>06</span></div><h3>Delivery</h3><p>Hand over passed cards and record the recipient, delivery time, and delivery officer.</p></article>
+    </div>
+  </section>
+  <section class="cf-workspaces" aria-label="Workspaces">
+    @if (hasLoggedIn && canViewDeliveries) {
+      <a class="cf-workspace" routerLink="/deliveries"><span class="cf-kicker">DELIVERY WORKSPACE</span><h2>Deliveries <i class="fas fa-arrow-right" aria-hidden="true"></i></h2><p>Hand over inspected cards and record receipt.</p><span class="cf-workspace-tag">Quality passed → Delivered</span></a>
+    }
+    @if (hasLoggedIn && canViewQuality) {
+      <a class="cf-workspace" routerLink="/quality-checks"><span class="cf-kicker">QUALITY WORKSPACE</span><h2>Quality checks <i class="fas fa-arrow-right" aria-hidden="true"></i></h2><p>Inspect cards from completed batches and record results with failure reasons.</p><span class="cf-workspace-tag">Pending → Passed / Failed</span></a>
+    }
+    @if (hasLoggedIn && canViewRequests) {
+      <a class="cf-workspace" routerLink="/card-requests"><span class="cf-kicker">ENROLLMENT WORKSPACE</span><h2>Card requests <i class="fas fa-arrow-right" aria-hidden="true"></i></h2><p>Create, review, approve, and correct employee requests.</p><span class="cf-workspace-tag">Draft → Under Review → Approved / Rejected</span></a>
+    }
+    @if (hasLoggedIn && canViewBatches) {
+      <a class="cf-workspace" routerLink="/production-batches"><span class="cf-kicker">PRODUCTION WORKSPACE</span><h2>Batches <i class="fas fa-arrow-right" aria-hidden="true"></i></h2><p>Organize approved requests and manage production batches.</p><span class="cf-workspace-tag">Draft → In Production → Completed</span></a>
+    }
+  </section>
+  <div class="cf-coming"><i class="fas fa-route" aria-hidden="true"></i><div><strong>Next on the roadmap</strong><p>Reproduction of cards that failed quality inspection.</p></div><span>Coming later</span></div>
+</div>

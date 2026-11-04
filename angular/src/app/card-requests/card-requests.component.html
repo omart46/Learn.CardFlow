@@ -1,0 +1,163 @@
+<section aria-labelledby="requests-title">
+  <div class="cf-page-eyebrow">WORKSPACE <span>/</span> CARD OPERATIONS</div>
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
+    <div>
+      <h1 id="requests-title">Card Requests</h1>
+      <p class="text-muted mb-0">Manage employee requests, from first draft to final decision.</p>
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary" (click)="load()" [disabled]="loading || !!pendingId">Refresh</button>
+      @if (can('Create')) {
+        <button class="btn btn-primary" (click)="openCreate()" [disabled]="showCreate"><i class="fas fa-plus me-2" aria-hidden="true"></i>New Request</button>
+      }
+    </div>
+  </div>
+
+  @if (notice) { <div class="alert alert-success" role="status">{{ notice }}</div> }
+
+  @if (attentionCount > 0) {
+    <div class="alert alert-warning d-flex flex-wrap align-items-center justify-content-between gap-2" role="status">
+      <span><i class="fas fa-exclamation-circle me-2" aria-hidden="true"></i>{{ attentionCount }} {{ attentionCount === 1 ? 'of your requests needs' : 'of your requests need' }} correction or resubmission.</span>
+      <button class="btn btn-sm btn-outline-secondary" (click)="setView('attention')" [disabled]="loading || saving || !!pendingId">View requests</button>
+    </div>
+  }
+  <div class="d-flex flex-wrap gap-2 mb-4" role="group" aria-label="Request view">
+    <button class="btn" [class.btn-primary]="view === 'all'" [class.btn-outline-secondary]="view !== 'all'" [attr.aria-pressed]="view === 'all'" (click)="setView('all')" [disabled]="loading || saving || !!pendingId">All Requests</button>
+    <button class="btn" [class.btn-primary]="view === 'mine'" [class.btn-outline-secondary]="view !== 'mine'" [attr.aria-pressed]="view === 'mine'" (click)="setView('mine')" [disabled]="loading || saving || !!pendingId">My Requests</button>
+    <button class="btn" [class.btn-primary]="view === 'attention'" [class.btn-outline-secondary]="view !== 'attention'" [attr.aria-pressed]="view === 'attention'" (click)="setView('attention')" [disabled]="loading || saving || !!pendingId">Needs Attention <span class="ms-1">({{ attentionCount }})</span></button>
+  </div>
+
+  <form class="cf-filters mb-4" [formGroup]="filtersForm" (ngSubmit)="applyFilters()" aria-label="Search and filter requests">
+    <div class="cf-filter-grid">
+      <div class="cf-search-field"><label for="request-search" class="form-label">Search requests</label><input id="request-search" class="form-control" formControlName="filter" type="search" maxlength="128" placeholder="Employee name or number" /></div>
+      <div><label for="request-status" class="form-label">Status</label><select id="request-status" class="form-control" formControlName="status"><option value="">All statuses</option><option value="0">Draft</option><option value="1">Under Review</option><option value="2">Approved</option><option value="3">Rejected</option></select></div>
+      <div><label for="request-from" class="form-label">Created from</label><input id="request-from" class="form-control" type="date" formControlName="createdFrom" /></div>
+      <div><label for="request-to" class="form-label">Created to</label><input id="request-to" class="form-control" type="date" formControlName="createdTo" /></div>
+    </div>
+    <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-3"><span class="cf-filter-hint">{{ hasFilters ? 'Filters applied to the selected request view.' : 'Search all results in the selected request view.' }}</span><div class="d-flex gap-2"><button type="button" class="btn btn-outline-secondary" (click)="clearFilters()" [disabled]="loading || saving || !!pendingId">Clear</button><button type="submit" class="btn btn-primary" [disabled]="loading || saving || !!pendingId"><i class="fas fa-search me-2" aria-hidden="true"></i>Apply filters</button></div></div>
+    @if (filterError) { <p class="text-danger small mt-2 mb-0" role="alert">{{ filterError }}</p> }
+  </form>
+
+  @if (rejecting && can('Decide')) {
+    <div class="card mb-4" role="region" aria-labelledby="reject-title">
+      <div class="card-body">
+        <h2 class="h5" id="reject-title">Reject request — {{ rejecting.employeeName }}</h2>
+        <form [formGroup]="rejectionForm" (ngSubmit)="confirmReject()">
+          <label class="form-label" for="rejection-reason">Rejection reason</label>
+          <textarea id="rejection-reason" class="form-control" formControlName="reason" rows="3"
+            maxlength="500" required aria-describedby="reason-help reason-error"
+            [attr.aria-invalid]="rejectionForm.controls.reason.touched && rejectionForm.controls.reason.invalid"></textarea>
+          <div class="d-flex justify-content-between mt-2 text-muted small" id="reason-help">
+            <span>Explain what needs to be corrected. This reason will be visible with the request.</span>
+            <span>{{ rejectionForm.controls.reason.value.length }}/500</span>
+          </div>
+          @if (rejectionForm.controls.reason.touched && rejectionForm.controls.reason.invalid) {
+            <p class="text-danger small mt-2" id="reason-error">Enter a reason of up to 500 characters. Spaces alone are not allowed.</p>
+          }
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-danger" type="submit" [disabled]="!!pendingId">{{ pendingId ? 'Saving…' : 'Confirm Rejection' }}</button>
+            <button class="btn btn-outline-secondary" type="button" (click)="rejecting = null" [disabled]="!!pendingId">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  @if (showCreate && (editing ? can('Edit') : can('Create'))) {
+    <div class="card mb-4">
+      <div class="card-body">
+        <h2 class="h5">{{ editing ? 'Correct Request' : 'New Request' }}</h2>
+        @if (editing?.rejectionReason) {
+          <div class="alert alert-warning"><strong>Previous rejection reason:</strong> {{ editing?.rejectionReason }}</div>
+        }
+        <form [formGroup]="form" (ngSubmit)="create()">
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label for="employee-name" class="form-label">Employee Name</label>
+              <input id="employee-name" class="form-control" formControlName="employeeName" maxlength="128"
+                [attr.aria-invalid]="form.controls.employeeName.touched && form.controls.employeeName.invalid"
+                aria-describedby="name-error" required />
+              @if (form.controls.employeeName.touched && form.controls.employeeName.invalid) {
+                <div id="name-error" class="text-danger small mt-1">Enter an employee name (up to 128 characters).</div>
+              }
+            </div>
+            <div class="col-md-6">
+              <label for="employee-number" class="form-label">Employee Number</label>
+              <input id="employee-number" class="form-control" formControlName="employeeNumber" maxlength="32"
+                [attr.aria-invalid]="form.controls.employeeNumber.touched && form.controls.employeeNumber.invalid"
+                aria-describedby="number-error" required />
+              @if (form.controls.employeeNumber.touched && form.controls.employeeNumber.invalid) {
+                <div id="number-error" class="text-danger small mt-1">Enter an employee number (up to 32 characters).</div>
+              }
+            </div>
+          </div>
+          <div class="d-flex gap-2 mt-3">
+            <button class="btn btn-primary" type="submit" [disabled]="saving">{{ saving ? 'Saving…' : editing ? 'Save Corrections' : 'Create Request' }}</button>
+            <button class="btn btn-outline-secondary" type="button" (click)="showCreate = false; editing = null" [disabled]="saving">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+
+  <div class="card" [attr.aria-busy]="loading">
+    <div class="cf-register-heading"><div><span class="cf-register-icon"><i class="far fa-id-card" aria-hidden="true"></i></span><strong>Request register</strong><span class="cf-count">{{ totalCount }} requests</span></div><span class="cf-register-note">Latest requests first</span></div>
+    <div class="card-body">
+      @if (loading) {
+        <p role="status">Loading requests…</p>
+      } @else if (loadError) {
+        <div class="alert alert-danger" role="alert">Could not load requests. Please try Refresh.</div>
+      } @else if (items.length === 0) {
+        <p class="text-muted mb-0">{{ hasFilters ? 'No requests match your filters. Try another search or clear the filters.' : 'No card requests found.' }}</p>
+      } @else {
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <caption class="visually-hidden">Employee card requests and available actions</caption>
+            <thead><tr>
+              <th scope="col">Employee Name</th><th scope="col">Employee Number</th>
+              <th scope="col">Status</th><th scope="col">Created</th><th scope="col">Actions</th>
+            </tr></thead>
+            <tbody>
+              @for (request of items; track request.id) {
+                <tr>
+                  <td>{{ request.employeeName }}
+                    @if (request.rejectionReason) {
+                      <details class="mt-2 cf-reason"><summary>Rejection reason</summary><p class="mt-2 mb-0">{{ request.rejectionReason }}</p></details>
+                    }
+                  </td><td>{{ request.employeeNumber }}</td>
+                  <td><span class="badge" [ngClass]="badgeClasses[request.status]">{{ statuses[request.status] || 'Unknown' }}</span>
+                    @if (request.needsResubmission) { <small class="d-block mt-2 text-muted">Awaiting resubmission</small> }
+                  </td>
+                  <td>{{ request.creationTime | date:'medium' }}</td>
+                  <td><div class="d-flex flex-wrap gap-2">
+                    @if (canCorrect(request)) {
+                      <button class="btn btn-sm btn-outline-primary" (click)="openCorrection(request)" [disabled]="!!pendingId || saving">{{ request.status === 3 ? 'Correct Request' : 'Edit Corrections' }}</button>
+                      @if (request.status === 0 && request.needsResubmission) {
+                        <button class="btn btn-sm btn-primary" (click)="resubmit(request)" [disabled]="!!pendingId || saving || showCreate">Resubmit for Review</button>
+                      }
+                    } @else if (request.status === 0 && !request.needsResubmission && can('StartReview')) {
+                      <button class="btn btn-sm btn-outline-primary" (click)="transition(request, 'start-review')" [disabled]="!!pendingId">Start Review</button>
+                    } @else if (request.status === 1 && can('Decide')) {
+                      <button class="btn btn-sm btn-outline-success" (click)="transition(request, 'approve')" [disabled]="!!pendingId">Approve</button>
+                      <button class="btn btn-sm btn-outline-danger" (click)="openReject(request)" [disabled]="!!pendingId">Reject</button>
+                    } @else { <span class="text-muted">—</span> }
+                    @if (pendingId === request.id) { <span role="status">Updating…</span> }
+                  </div></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+      @if (!loadError) {
+        <nav aria-label="Request pages" class="d-flex flex-wrap align-items-center justify-content-between gap-2 mt-3">
+          <span>{{ totalCount }} total · Page {{ page + 1 }}</span>
+          <div class="d-flex gap-2">
+            <button class="btn btn-sm btn-outline-secondary" (click)="goToPage(page - 1)" [disabled]="page === 0 || loading || !!pendingId">Previous</button>
+            <button class="btn btn-sm btn-outline-secondary" (click)="goToPage(page + 1)" [disabled]="(page + 1) * pageSize >= totalCount || loading || !!pendingId">Next</button>
+          </div>
+        </nav>
+      }
+    </div>
+  </div>
+</section>

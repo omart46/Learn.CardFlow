@@ -1,0 +1,74 @@
+/* You can add global styles to this file, and also import other style files */
+
+body { background: #f6f8fa; }
+.lpx-content-container { background: #f6f8fa; }
+.lpx-footbar { color: #8b99a6; font-size: 11px; }
+.lpx-footbar-copyright { font-weight: 600; }
+.btn:focus-visible, a:focus-visible { outline: 3px solid #41a59a; outline-offset: 3px; }
+
+
+:root {
+  --lpx-theme-light-bg: url('assets/images/login/login-bg-img-light.svg');
+  --lpx-theme-dim-bg: url('assets/images/login/login-bg-img-dim.svg');
+  --lpx-theme-dark-bg: url('assets/images/login/login-bg-img-dark.svg');
+
+  --lpx-logo-icon: url('assets/images/logo/cardflow.svg');
+  --lpx-logo-url: var(--lpx-logo-icon);
+  --lpx-logo: var(--lpx-logo-icon);
+
+  .abp-logo {
+    background-repeat: no-repeat;
+  }
+
+  .abp-support {
+    width: 178px;
+    height: 30px;
+    background-image: url('assets/images/getting-started/abp-support.svg');
+  }
+
+  .abp-community {
+    width: 215px;
+    height: 30px;
+    background-image: url('assets/images/getting-started/abp-community.svg');
+  }
+
+  .abp-blog {
+    width: 142px;
+    height: 30px;
+    background-image: url('assets/images/getting-started/abp-blog.svg');
+  }
+
+  .logo-x {
+    width: 20px;
+    height: 20px;
+    background-image: url('assets/images/getting-started/x.svg');
+  }
+}
+
+/* CardFlow workspace palette and shared layout. */
+:root {
+  --cf-ink: #223b4c;
+  --cf-muted: #667c8d;
+  --cf-accent: #147e76;
+  --cf-canvas: #f3f6f9;
+  --cf-border: #e0e8ee;
+}
+body { background:var(--cf-canvas); color:var(--cf-ink); -webkit-font-smoothing:antialiased; }
+.lpx-content-container { background:var(--cf-canvas); }
+.lpx-sidebar-container .lpx-sidebar,
+.lpx-sidebar-container .lpx-sidebar .lpx-nav .lpx-nav-menu,
+.lpx-sidebar .lpx-logo-container { background-color:#172c38; }
+.lpx-sidebar { color:#b4c5cf; }
+.lpx-nav-menu .lpx-menu-item-link { margin:4px 12px; border-radius:9px; color:#bacbd5; transition:background .15s,color .15s; }
+.lpx-nav-menu .lpx-menu-item-link:hover { background:#213e4a; color:#fff; }
+.lpx-nav-menu .lpx-menu-item-link.selected,
+.lpx-nav-menu .lpx-menu-item-link.expanded { background:#224b50; color:#e2f5ef; }
+.lpx-nav-menu .lpx-menu-item-link.selected .lpx-menu-item-icon,
+.lpx-nav-menu .lpx-menu-item-link.expanded .lpx-menu-item-icon { color:#88d4be; }
+.lpx-topbar-container { border-bottom:1px solid var(--cf-border); box-shadow:none; }
+.lpx-footbar { color:#6e8190; font-size:11px; border-top:1px solid #e5ebf0; }
+::selection { background:#cde9df; color:#163e3c; }
+input,textarea,select { accent-color:var(--cf-accent); }
+button:disabled { cursor:not-allowed; }
+.table-responsive { scrollbar-width:thin; scrollbar-color:#c4d5db transparent; }
+@media(prefers-reduced-motion:reduce) { *,*::before,*::after { scroll-behavior:auto !important; transition:none !important; animation:none !important; } }
